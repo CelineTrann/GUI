@@ -14,6 +14,7 @@ public class Choose extends JFrame{
     final int F_HEIGHT  =  150;
 
     LinearVolume linearVolume = new LinearVolume();
+    AreaFunction areaFunction = new AreaFunction();
 
     public Choose(){
 
@@ -48,11 +49,15 @@ public class Choose extends JFrame{
                 String selected = (String) comboBox.getSelectedItem();
 
                 switch (selected){
-                    case "Volume": linearVolume.setVisible(true);
+                    case "Volume":
+                        linearVolume.setVisible(true);
                         dispose();
                         break;
 
                     case "Linear Area":
+                        areaFunction.Area("Linear");
+                        areaFunction.setVisible(true);
+                        dispose();
                         break;
 
                     case "Quadratic Area":
