@@ -10,7 +10,7 @@ import java.awt.event.ActionListener;
  */
 public class LinearVolume extends JFrame {
 
-    //initiates restrictions for calculations
+    //initiates restrictions and variables for calculations
     private double m;
     private double b;
     private double d1;
@@ -18,25 +18,36 @@ public class LinearVolume extends JFrame {
     private double gx;
     private double slice;
 
+    //initate variable for restrictions
+    private double zero;
+    private boolean cont;
+
     //initiate volume variable
     private double volume;
 
-    int Width = 300;
-    int Length = 150;
+    //initiate variable for JFrame
+    final int Width = 220;
+    final int Length = 400;
 
+    //-----------------------------------------------------------------------------------------------
+    //initiates LinearVolume JFrame
     public LinearVolume (){
         super("Linear Volume");
 
+        //set size and close operation of frame
         setSize(Width, Length);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+        setDefaultLookAndFeelDecorated(true);
 
+        //-------------------------------------------------------------------
         // Set up heading for jframe
-        JLabel heading = new JLabel("Calculating Volume Under a Liner Function");
+        JLabel heading = new JLabel("Volume Under a Liner Function");
         heading.setFont( new Font("Arial", Font.BOLD, 12));
 
         // Create prompt for user
         JLabel choose = new JLabel("For the function: f(x) = mx + b");
 
+        //-------------------------------------------------------------------
         //initiate instructions
         JLabel mlabel, blabel, lowerD, upperD, vRestrict, iterations;
         mlabel = new JLabel("m value:");
@@ -48,16 +59,19 @@ public class LinearVolume extends JFrame {
 
         //initiate text field
         JTextField slope, vShift, D1, D2, Gx, iter;
-        slope = new JTextField();
-        vShift = new JTextField();
-        D1 = new JTextField();
-        D2 = new JTextField();
-        Gx = new JTextField();
-        iter = new JTextField();
+        slope = new JTextField(12);
+        vShift = new JTextField(12);
+        D1 = new JTextField(12);
+        D2 = new JTextField(12);
+        Gx = new JTextField(12);
+        iter = new JTextField(12);
 
+        //create enter button and label to display calculated volume
         JButton enter = new JButton("Enter");
-        JTextField VolumeDisplay = new JTextField();
+        JLabel VolumeDisplay = new JLabel();
 
+        //-------------------------------------------------------------------
+        //set JFrame layout to FlowLayout
         setLayout(new FlowLayout());
 
         // Add components to the JFrame
@@ -74,24 +88,86 @@ public class LinearVolume extends JFrame {
         add(enter);
         add(VolumeDisplay);
 
-
+        //-------------------------------------------------------------------
+        //initiate action listener when enter button in clicked
         enter.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                m = Double.parseDouble(mlabel.getText());
-                b = Double.parseDouble(blabel.getText());
+
+                //change user input values to doubles
+                m = Double.parseDouble(slope.getText());
+                b = Double.parseDouble(vShift.getText());
                 d1 = Double.parseDouble(D1.getText());
                 d2 = Double.parseDouble(D2.getText());
                 gx = Double.parseDouble(Gx.getText());
                 slice = Double.parseDouble(iter.getText());
 
+                //------------------------------------------------------------
+                //calculate zero intercept for restriction
+                zero = (-b) / m;
+
+                //------------------------------------------------------------
+                //set restriction on what use can enter
+                if (d2 < d1){
+                    JOptionPane.showMessageDialog(null,"Upper domain must be greater than lower domain",
+                            "Alert",JOptionPane.WARNING_MESSAGE);
+
+                    cont = false;
+                }else if (d1 < 0) {
+                    JOptionPane.showMessageDialog(null, "Lower domain must be greater than zero",
+                            "Alert", JOptionPane.WARNING_MESSAGE);
+
+                    cont = false;
+
+                }else if (b < 0 && m < 0){
+                    JOptionPane.showMessageDialog(null,"you m value or b value has to be larger than zero",
+                            "Alert",JOptionPane.WARNING_MESSAGE);
+
+                    cont = false;
+
+                }else if (m < 0 && zero < d2 ){
+                    JOptionPane.showMessageDialog(null,"Your higher domain needs to be less than or equal to " + zero,
+                            "Alert",JOptionPane.WARNING_MESSAGE);
+
+                    cont = false;
+
+                }else if (b < 0 && d1 < zero) {
+                    JOptionPane.showMessageDialog(null,"You lower domain needs to be greater than or equal to " + zero,
+                            "Alert",JOptionPane.WARNING_MESSAGE);
+
+                    cont = false;
+
+                }else if (gx < 0) {
+                    gx = 0;
+
+                }else{
+                    cont = true;
+
+                }//close if statement
+
+                //------------------------------------------------------------
+                //set volume to zero
+                volume = 0;
+
+                //call volume class to calculate volume under a linear curve
                 Volume(m, b, d1, d2, gx, slice);
 
-                VolumeDisplay.setText("Your volume is:" + String.valueOf(volume));
+                //------------------------------------------------------------
+                //if restrictions are not met will produce an error
+                if (!cont){
+                    VolumeDisplay.setText("Volume is: Error");
 
-            }
-        });
-    }
+                }else{
+                    //display calculate volume as text
+                    VolumeDisplay.setText("Volume is: " + String.valueOf(volume));
 
+                }//close if statement
+            }//close actionPerformed method
+        });//close actionListener
+
+    }//close LinearVolume JFrame
+
+    //-----------------------------------------------------------------------------------------------
+    //method that calculates the volume under a linear curve
     private double Volume (double m, double b, double d1, double d2, double gx, double slice){
 
         //initiates variables used to calculated volume
@@ -100,6 +176,7 @@ public class LinearVolume extends JFrame {
         double height;
         double width;
 
+        //-------------------------------------------------------------------
         //initiate for loop to allow for an iterative method of finding the volume
         //int i is to restrict the iterative calculation to the domain range
         for (int i = 0; i < slice; i++ ){
